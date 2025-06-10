@@ -5,32 +5,22 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
-class CreateProfilesTable extends Migration
+class CreatePermissionTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        Schema::create('profiles', function (Blueprint $table) {
+        Schema::create('tbl_permission', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique()->default(Str::uuid());
-            $table->string('profile');
+            $table->string('permission');
             $table->text('description')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('profiles');
+        Schema::dropIfExists('tbl_permission');
     }
 }

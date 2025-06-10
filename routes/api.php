@@ -1,10 +1,12 @@
 <?php
 
+// use App\Http\Controllers\ModuleController;
+use App\Http\Controllers\SystemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+// use App\Models\User;
+// use Illuminate\Http\Request;
+// use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,10 +20,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
+Route::group(['middleware' => ['api']], function () {
 
-Route::get('/profile', [ProfileController::class, 'list']);
+    // Route::post('/login', [SystemController::class, 'auth']);
+    
+    // Profile
+    Route::middleware('auth:sanctum')->get('/profile', [ProfileController::class, 'list']);
+    Route::middleware('auth:sanctum')->get('/profile/{uuid}', [ProfileController::class, 'fetch']);
+    Route::middleware('auth:sanctum')->post('/profile', [ProfileController::class, 'post']);
+    Route::middleware('auth:sanctum')->delete('/profile/{uuid}', [ProfileController::class, 'delete']);
+    
+    // Users
+    Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'list']);
+    Route::middleware('auth:sanctum')->get('/user/{uuid}', [UserController::class, 'fetch']);
+    Route::middleware('auth:sanctum')->post('/user', [UserController::class, 'post']);
+    Route::middleware('auth:sanctum')->delete('/user/{uuid}', [UserController::class, 'delete']);
+});
 
-Route::get('/user', [UserController::class, 'list']);
+
+// Route::get('/module', [ModuleController::class, 'list']);
+// Route::get('/module-permissions', [ModuleController::class, 'permissionsByModule']);

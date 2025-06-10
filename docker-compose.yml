@@ -13,21 +13,3 @@ services:
     entrypoint: ["sh", "docker/entrypoint.sh"]
     env_file:
       - .env
-
-  db:
-    image: postgres:16
-    container_name: db
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${DB_DATABASE}
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "5432:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    env_file:
-      - .env
-
-volumes:
-  db_data:

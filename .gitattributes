@@ -8,3 +8,6 @@
 
 /.github export-ignore
 CHANGELOG.md export-ignore
+
+# Force all .sh scripts to use LF line endings
+*.sh text eol=lf

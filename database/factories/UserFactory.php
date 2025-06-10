@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Profile;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -16,7 +17,7 @@ class UserFactory extends Factory
     {
         return [
             'uuid' => (string) Str::uuid(),
-            'uuid_profile' => '974f760e-7f05-4b89-9ccd-1cc4ff81f2db',
+            'uuid_profile' => Profile::inRandomOrder()->first()->uuid,
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
         ];
