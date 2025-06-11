@@ -1,6 +1,6 @@
 <?php
 
-// use App\Http\Controllers\ModuleController;
+use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['middleware' => ['api']], function () {
+/* Route::group(['middleware' => ['api']], function () {
 
     // Route::post('/login', [SystemController::class, 'auth']);
     
@@ -35,8 +35,19 @@ Route::group(['middleware' => ['api']], function () {
     Route::middleware('auth:sanctum')->get('/user/{uuid}', [UserController::class, 'fetch']);
     Route::middleware('auth:sanctum')->post('/user', [UserController::class, 'post']);
     Route::middleware('auth:sanctum')->delete('/user/{uuid}', [UserController::class, 'delete']);
-});
+}); */
 
+// Profile
+Route::get('/profile', [ProfileController::class, 'list']);
+Route::get('/profile/{uuid}', [ProfileController::class, 'fetch']);
+Route::post('/profile', [ProfileController::class, 'post']);
+Route::delete('/profile/{uuid}', [ProfileController::class, 'delete']);
 
-// Route::get('/module', [ModuleController::class, 'list']);
-// Route::get('/module-permissions', [ModuleController::class, 'permissionsByModule']);
+// Users
+Route::get('/user', [UserController::class, 'list']);
+Route::get('/user/{uuid}', [UserController::class, 'fetch']);
+Route::post('/user', [UserController::class, 'post']);
+Route::delete('/user/{uuid}', [UserController::class, 'delete']);
+
+Route::get('/module', [ModuleController::class, 'list']);
+Route::get('/module-permissions', [ModuleController::class, 'permissionsByModule']);

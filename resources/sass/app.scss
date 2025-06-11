@@ -1,0 +1,85 @@
+// resources/sass/app.scss
+
+// Importe as funções e variáveis do Bootstrap primeiro
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/maps";
+@import "~bootstrap/scss/mixins";
+@import "~bootstrap/scss/utilities";
+
+// Opcional: Defina suas próprias variáveis de cor, etc. aqui para sobrescrever as do Bootstrap
+// $primary: #007bff;
+// $danger: #dc3545;
+
+// Importe o restante do Bootstrap
+@import "~bootstrap/scss/bootstrap";
+
+// Ou, se quiser importar apenas componentes específicos para otimizar:
+// @import "~bootstrap/scss/root";
+// @import "~bootstrap/scss/reboot";
+// @import "~bootstrap/scss/type";
+// @import "~bootstrap/scss/images";
+// @import "~bootstrap/scss/containers";
+// @import "~bootstrap/scss/grid";
+// ... (e assim por diante para cada componente que você precisar)
+
+// Seus estilos personalizados abaixo do Bootstrap
+body {
+    font-family: 'Nunito', sans-serif;
+}
+
+#sidebar-wrapper {
+    min-height: 100vh;
+    margin-left: -15rem; // Esconde a sidebar por padrão em mobile
+    transition: margin .25s ease-out;
+    width: 15%; // Largura da sidebar
+}
+
+#sidebar-wrapper .sidebar-heading {
+    padding: 0.875rem 1.25rem;
+    font-size: 1.2rem;
+}
+
+#sidebar-wrapper .list-group {
+    width: 15rem;
+}
+
+#page-content-wrapper {
+    min-width: 100vw; // Ocupa toda a largura
+}
+
+// Estilo para quando a sidebar estiver "aberta" (para mobile)
+body.toggled #sidebar-wrapper {
+    margin-left: 0;
+}
+
+body.toggled #page-content-wrapper {
+    min-width: calc(100vw - 15rem); // Ajusta a largura do conteúdo
+}
+
+@media (min-width: 768px) { // Desktop
+    #sidebar-wrapper {
+        margin-left: 0; // Sempre visível
+    }
+
+    #page-content-wrapper {
+        min-width: 0; // Remove o min-width padrão
+        width: 100%; // Ocupa o restante
+    }
+
+    body.toggled #sidebar-wrapper {
+        margin-left: -15rem; // Esconde a sidebar em desktop
+    }
+
+    body.toggled #page-content-wrapper {
+        min-width: 100vw; // Ocupa toda a largura
+    }
+
+    .breadcrumb {
+        margin-left: 3.5rem;
+    }
+
+    .page-content {
+        min-width: 95%;
+    }
+}
