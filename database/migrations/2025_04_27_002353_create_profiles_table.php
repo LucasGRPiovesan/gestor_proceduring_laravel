@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 
 class CreateProfilesTable extends Migration
 {
@@ -16,7 +15,7 @@ class CreateProfilesTable extends Migration
     {
         Schema::create('tbl_profile', function (Blueprint $table) {
             $table->id();
-            $table->uuid('uuid')->unique()->default(Str::uuid());
+            $table->uuid('uuid')->unique();
             $table->string('profile');
             $table->text('description')->nullable();
             $table->timestamps();

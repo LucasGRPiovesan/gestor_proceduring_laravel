@@ -40,7 +40,8 @@ use Illuminate\Support\Facades\Route;
 // Profile
 Route::get('/profile', [ProfileController::class, 'list']);
 Route::get('/profile/{uuid}', [ProfileController::class, 'fetch']);
-Route::post('/profile', [ProfileController::class, 'post']);
+Route::post('/profile', [ProfileController::class, 'store']);
+Route::patch('/profile/{uuid}', [ProfileController::class, 'update']);
 Route::delete('/profile/{uuid}', [ProfileController::class, 'delete']);
 
 // Users

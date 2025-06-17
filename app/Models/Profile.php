@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Profile extends Model
 {
@@ -13,7 +14,6 @@ class Profile extends Model
     protected $table = 'tbl_profile';
 
     protected $fillable = [
-        'uuid',
         'profile',
         'description',
     ];
@@ -40,6 +40,17 @@ class Profile extends Model
     public $incrementing = true;
 
     protected $keyType = 'int';
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
+    }
 
     public function users()
     {
