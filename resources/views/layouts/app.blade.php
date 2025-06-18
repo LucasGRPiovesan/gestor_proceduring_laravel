@@ -36,10 +36,10 @@
     @stack('scripts') {{-- Para JS específico de páginas --}}
 
     {{-- Script para toggle da sidebar (opcional, para dispositivos móveis) --}}
-    <script>
+    {{-- <script>
         document.getElementById('sidebarToggle').addEventListener('click', function() {
             document.getElementById('wrapper').classList.toggle('toggled');
         });
-    </script>
+    </script> --}}
 </body>
 </html>

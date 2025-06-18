@@ -128,4 +128,24 @@ class ProfileController extends Controller
             return response()->json(['error' => $th->getMessage()], 500);
         }
     }
+
+    public function options()
+    {
+        try {
+            $profiles = Profile::orderBy('profile', 'asc')
+                ->get(['uuid', 'profile']);
+
+            $options = $profiles->map(function ($item) {
+                return [
+                    'value' => $item->uuid,
+                    'label' => $item->profile,
+                ];
+            });
+
+            return response()->json($options, 200);
+
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()], 500);
+        }
+    }
 }

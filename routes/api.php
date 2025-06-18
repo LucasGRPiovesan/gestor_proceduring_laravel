@@ -43,11 +43,12 @@ Route::get('/profile/{uuid}', [ProfileController::class, 'fetch']);
 Route::post('/profile', [ProfileController::class, 'store']);
 Route::patch('/profile/{uuid}', [ProfileController::class, 'update']);
 Route::delete('/profile/{uuid}', [ProfileController::class, 'delete']);
-
+Route::get('/profile-select', [ProfileController::class, 'options']);
 // Users
 Route::get('/user', [UserController::class, 'list']);
 Route::get('/user/{uuid}', [UserController::class, 'fetch']);
-Route::post('/user', [UserController::class, 'post']);
+Route::post('/user', [UserController::class, 'store']);
+Route::patch('/user/{uuid}', [UserController::class, 'update']);
 Route::delete('/user/{uuid}', [UserController::class, 'delete']);
 
 Route::get('/module', [ModuleController::class, 'list']);

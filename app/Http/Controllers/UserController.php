@@ -12,12 +12,34 @@ class UserController extends Controller
     public function list()
     {
         try {
-            
-            $users = User::with('profile')->get();
-            return response()->json($users, 200);
+            $perPage = (int) request()->query('perPage', 10);
+            $page    = (int) request()->query('page', 1);
+
+            $perPage = $perPage > 0 ? $perPage : 10;
+            $page    = $page > 0   ? $page    : 1;
+
+            $query = User::with('profile')
+                        ->orderBy('created_at', 'desc');
+
+            $total = $query->count();
+
+            $users = $query
+                ->skip(($page - 1) * $perPage)
+                ->take($perPage)
+                ->get();
+
+            return response()->json([
+                'data' => $users,
+                'meta' => [
+                    'total'       => $total,
+                    'perPage'     => $perPage,
+                    'currentPage' => $page,
+                    'lastPage'    => ceil($total / $perPage),
+                ],
+            ], 200);
 
         } catch (\Throwable $th) {
-            
+
             return response()->json(['error' => $th->getMessage()], 500);
         }
     }
@@ -34,7 +56,37 @@ class UserController extends Controller
         }   
     }
 
-    public function post(Request $request) 
+    public function update(Request $request, $uuid)
+    {
+        $body = $request->all();
+
+        try {
+
+            $user = User::where('uuid', $uuid)->first();
+            
+            if (!$user) {
+                return response()->json([
+                    'message' => 'User not found!',
+                ], 404);
+            }
+
+            $allowedFields = ['uuid_profile', 'name', 'email'];
+            $data = collect($body)->only($allowedFields)->toArray();
+
+            $user->update($data);
+
+            return response()->json([
+                'message' => 'User updated successfully!',
+                'data' => $user
+            ], 200);
+
+        } catch (\Throwable $th) {
+            
+            return response()->json(['error' => $th->getMessage()], 500);
+        }
+    }
+
+    public function store(Request $request) 
     {
         $body = $request->all();
 
