@@ -4,39 +4,36 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use App\Application\UseCases\User\{DeleteUserUseCase, ListUserUseCase, FetchUserUseCase, StoreUserUseCase, UpdateUserUseCase};
 
 class UserController extends Controller
 {
+    private ListUserUseCase $listUserUseCase;
+    private FetchUserUseCase $fetchUserUseCase;
+    private StoreUserUseCase $storeUserUseCase;
+    private UpdateUserUseCase $updateUserUseCase;
+    private DeleteUserUseCase $deleteUserUseCase;
+
+    public function __construct(
+        ListUserUseCase $listUserUseCase,
+        FetchUserUseCase $fetchUserUseCase,
+        StoreUserUseCase $storeUserUseCase,
+        UpdateUserUseCase $updateUserUseCase,
+        DeleteUserUseCase $deleteUserUseCase
+    ) {
+        $this->listUserUseCase = $listUserUseCase;
+        $this->fetchUserUseCase = $fetchUserUseCase;
+        $this->storeUserUseCase = $storeUserUseCase;
+        $this->updateUserUseCase = $updateUserUseCase;
+        $this->deleteUserUseCase = $deleteUserUseCase;
+    }
 
     public function list()
     {
         try {
-            $perPage = (int) request()->query('perPage', 10);
-            $page    = (int) request()->query('page', 1);
 
-            $perPage = $perPage > 0 ? $perPage : 10;
-            $page    = $page > 0   ? $page    : 1;
-
-            $query = User::with('profile')
-                        ->orderBy('created_at', 'desc');
-
-            $total = $query->count();
-
-            $users = $query
-                ->skip(($page - 1) * $perPage)
-                ->take($perPage)
-                ->get();
-
-            return response()->json([
-                'data' => $users,
-                'meta' => [
-                    'total'       => $total,
-                    'perPage'     => $perPage,
-                    'currentPage' => $page,
-                    'lastPage'    => ceil($total / $perPage),
-                ],
-            ], 200);
+            $data = $this->listUserUseCase->execute(request());
+            return response()->json($data, 200);
 
         } catch (\Throwable $th) {
 
@@ -48,42 +45,27 @@ class UserController extends Controller
     {
         try {
 
-            return User::where('uuid', $uuid)->with('profile')->first();
+            $user = $this->fetchUserUseCase->execute($uuid);
+            return response()->json($user, 200);
 
+        } catch (\Illuminate\Database\QueryException $e) {
+
+            return response()->json([
+                'error' => 'Invalid UUID format.',
+                'message' => $e->getMessage(),
+            ], 400);
+        
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            
+            return response()->json([
+                'error' => 'User not found!',
+                'message' => $e->getMessage()
+            ], 404);
+        
         } catch (\Throwable $th) {
             
             return response()->json(['error' => $th->getMessage()], 500);
         }   
-    }
-
-    public function update(Request $request, $uuid)
-    {
-        $body = $request->all();
-
-        try {
-
-            $user = User::where('uuid', $uuid)->first();
-            
-            if (!$user) {
-                return response()->json([
-                    'message' => 'User not found!',
-                ], 404);
-            }
-
-            $allowedFields = ['uuid_profile', 'name', 'email'];
-            $data = collect($body)->only($allowedFields)->toArray();
-
-            $user->update($data);
-
-            return response()->json([
-                'message' => 'User updated successfully!',
-                'data' => $user
-            ], 200);
-
-        } catch (\Throwable $th) {
-            
-            return response()->json(['error' => $th->getMessage()], 500);
-        }
     }
 
     public function store(Request $request) 
@@ -91,18 +73,30 @@ class UserController extends Controller
         $body = $request->all();
 
         try {
-            
-            $newUser = User::create([
-                'uuid_profile' => $body['uuid_profile'],
-                'name' => $body['name'],
-                'email' => $body['email'],
-                'password' => Hash::make($body['password'])
-            ]);
+
+            $user = $this->storeUserUseCase->execute($body);
+            return response()->json($user, 200);
+
+        } catch (\InvalidArgumentException $e) {
 
             return response()->json([
-                'message' => 'User created successfully!',
-                'data' => $newUser
-            ], 200);
+                'error' => 'Invalid data provided.',
+                'message' => $e->getMessage()
+            ], 422);
+        
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            
+            return response()->json([
+                'error' => 'Profile not found!',
+                'message' => $e->getMessage()
+            ], 404);
+        
+        } catch (\Illuminate\Database\QueryException $e) {
+
+            return response()->json([
+                'error' => 'Database error.',
+                'message' => $e->getMessage(),
+            ], 500);
 
         } catch (\Throwable $th) {
             
@@ -110,24 +104,53 @@ class UserController extends Controller
         }
     }
 
+    public function update(Request $request, string $uuid)
+    {
+        try {
+
+            $updated = $this->updateUserUseCase->execute($uuid, $request->all());
+
+            return response()->json([
+                'message' => 'Profile updated successfully!',
+                'data' => $updated
+            ], 200);
+
+        } catch (\InvalidArgumentException $e) {
+
+            return response()->json([
+                'error' => 'Invalid data provided.',
+                'message' => $e->getMessage()
+            ], 422);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+
+            return response()->json([
+                'error' => 'Profile not found.'
+            ], 404);
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => 'An unexpected error occurred.',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function delete($uuid)
     {
         try {
 
-            $user = User::where('uuid', $uuid)->first();
-            
-            if (!$user) {
-                return response()->json([
-                    'message' => 'User not found!',
-                ], 404);
-            }
-            
-            $user->delete();
+            $this->deleteUserUseCase->execute($uuid);
+            return response()->json([
+                'message' => 'User was deleted successfully!'
+            ], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
 
             return response()->json([
-                'message' => 'User was deleted successfully!',
-                'data' => $user
-            ], 200);
+                'error' => 'Profile not found.',
+                'message' => $e->getMessage()
+            ], 404);
 
         } catch (\Throwable $th) {
             

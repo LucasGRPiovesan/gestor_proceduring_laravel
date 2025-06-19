@@ -147,7 +147,7 @@ function fetchUser(uuid) {
 
       document.getElementById('userName').value = user.name;
       document.getElementById('userEmail').value = user.email;
-      document.getElementById('profile').value = user.uuid_profile;
+      document.getElementById('profile').value = user.profile.uuid;
 
       const modal = Modal.getOrCreateInstance(storeModal);
       modal.show();

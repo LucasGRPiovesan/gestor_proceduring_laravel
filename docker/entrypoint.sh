@@ -19,11 +19,18 @@ composer install
 echo "Installing Node Dependencies."
 npm install
 
+# Run tests
+if php artisan test; then
+    echo "Tests were run!"
+else
+    echo "Error on running tests!"
+fi
+
 # Run migrations automatically
 if php artisan migrate --force; then
     echo "Migrations completed successfully!"
 else
-    echo "Error running migrations!"
+    echo "Error on running migrations!"
 fi
 
 # Run migrations automatically

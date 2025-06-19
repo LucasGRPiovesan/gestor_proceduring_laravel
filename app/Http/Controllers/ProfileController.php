@@ -4,36 +4,36 @@ namespace App\Http\Controllers;
 
 use App\Models\Profile;
 use Illuminate\Http\Request;
+use App\Application\UseCases\Profile\{DeleteProfileUseCase, ListProfileUseCase, FetchProfileUseCase, StoreProfileUseCase, UpdateProfileUseCase};
 
 class ProfileController extends Controller
 {
+    private ListProfileUseCase $listProfileUseCase;
+    private FetchProfileUseCase $fetchProfileUseCase;
+    private StoreProfileUseCase $storeProfileUseCase;
+    private UpdateProfileUseCase $updateProfileUseCase;
+    private DeleteProfileUseCase $deleteProfileUseCase;
+
+    public function __construct(
+        ListProfileUseCase $listProfileUseCase,
+        FetchProfileUseCase $fetchProfileUseCase,
+        StoreProfileUseCase $storeProfileUseCase,
+        UpdateProfileUseCase $updateProfileUseCase,
+        DeleteProfileUseCase $deleteProfileUseCase
+    ) {
+        $this->listProfileUseCase = $listProfileUseCase;
+        $this->fetchProfileUseCase = $fetchProfileUseCase;
+        $this->storeProfileUseCase = $storeProfileUseCase;
+        $this->updateProfileUseCase = $updateProfileUseCase;
+        $this->deleteProfileUseCase = $deleteProfileUseCase;
+    }
+
     public function list()
     {
         try {
-            $perPage = (int) request()->query('perPage', 10);
-            $page = (int) request()->query('page', 1);
 
-            $perPage = $perPage > 0 ? $perPage : 10;
-            $page = $page > 0 ? $page : 1;
-
-            $query = Profile::orderBy('created_at', 'desc');
-
-            $total = $query->count();
-
-            $profiles = $query
-                ->skip(($page - 1) * $perPage)
-                ->take($perPage)
-                ->get();
-
-            return response()->json([
-                'data' => $profiles,
-                'meta' => [
-                    'total' => $total,
-                    'perPage' => $perPage,
-                    'currentPage' => $page,
-                    'lastPage' => ceil($total / $perPage),
-                ]
-            ], 200);
+            $data = $this->listProfileUseCase->execute(request());
+            return response()->json($data, 200);
 
         } catch (\Throwable $th) {
             return response()->json(['error' => $th->getMessage()], 500);
@@ -44,12 +44,27 @@ class ProfileController extends Controller
     {
         try {
 
-            return Profile::where('uuid', $uuid)->first();
+            $profile = $this->fetchProfileUseCase->execute($uuid);
+            return response()->json($profile, 200);
 
+        } catch (\Illuminate\Database\QueryException $e) {
+
+            return response()->json([
+                'error' => 'Invalid UUID format.',
+                'message' => $e->getMessage(),
+            ], 400);
+        
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            
+            return response()->json([
+                'error' => 'Profile not found!',
+                'message' => $e->getMessage()
+            ], 404);
+        
         } catch (\Throwable $th) {
             
             return response()->json(['error' => $th->getMessage()], 500);
-        }   
+        }     
     }
 
     public function store(Request $request) 
@@ -57,16 +72,23 @@ class ProfileController extends Controller
         $body = $request->all();
 
         try {
-            
-            $newProfile = Profile::create([
-                'profile' => $body['profile'],
-                'description' => $body['description'],
-            ]);
+
+            $user = $this->storeProfileUseCase->execute($body);
+            return response()->json($user, 200);
+
+        } catch (\InvalidArgumentException $e) {
 
             return response()->json([
-                'message' => 'Profile created successfully!',
-                'data' => $newProfile
-            ], 201);
+                'error' => 'Invalid data provided.',
+                'message' => $e->getMessage()
+            ], 422);
+        
+        } catch (\Illuminate\Database\QueryException $e) {
+
+            return response()->json([
+                'error' => 'Database error.',
+                'message' => $e->getMessage(),
+            ], 500);
 
         } catch (\Throwable $th) {
             
@@ -74,33 +96,35 @@ class ProfileController extends Controller
         }
     }
 
-    public function update(Request $request, $uuid)
+    public function update(Request $request, string $uuid)
     {
-        $body = $request->all();
-
         try {
 
-            $profile = Profile::where('uuid', $uuid)->first();
-            
-            if (!$profile) {
-                return response()->json([
-                    'message' => 'Profile not found!',
-                ], 404);
-            }
-
-            $profile->update([
-                'profile' => $body['profile'],
-                'description' => $body['description'],
-            ]);
+            $updated = $this->updateProfileUseCase->execute($uuid, $request->all());
 
             return response()->json([
                 'message' => 'Profile updated successfully!',
-                'data' => $profile
+                'data' => $updated
             ], 200);
 
-        } catch (\Throwable $th) {
-            
-            return response()->json(['error' => $th->getMessage()], 500);
+        } catch (\InvalidArgumentException $e) {
+
+            return response()->json([
+                'error' => 'Invalid data provided.',
+                'message' => $e->getMessage()
+            ], 422);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+
+            return response()->json([
+                'error' => 'Profile not found.'
+            ], 404);
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => 'An unexpected error occurred.',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -108,20 +132,17 @@ class ProfileController extends Controller
     {
         try {
 
-            $profile = Profile::where('uuid', $uuid)->first();
-            
-            if (!$profile) {
-                return response()->json([
-                    'message' => 'Profile not found!',
-                ], 404);
-            }
-            
-            $profile->delete();
+            $this->deleteProfileUseCase->execute($uuid);
+            return response()->json([
+                'message' => 'Profile was deleted successfully!'
+            ], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
 
             return response()->json([
-                'message' => 'User was deleted successfully!',
-                'data' => $profile
-            ], 200);
+                'error' => 'Profile not found.',
+                'message' => $e->getMessage()
+            ], 404);
 
         } catch (\Throwable $th) {
             

@@ -14551,7 +14551,7 @@ function fetchUser(uuid) {
     current = user;
     document.getElementById('userName').value = user.name;
     document.getElementById('userEmail').value = user.email;
-    document.getElementById('profile').value = user.uuid_profile;
+    document.getElementById('profile').value = user.profile.uuid;
     var modal = bootstrap__WEBPACK_IMPORTED_MODULE_0__.Modal.getOrCreateInstance(storeModal);
     modal.show();
   })["catch"](function (error) {
