@@ -9,31 +9,32 @@
             <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {{-- <img src="{{ Auth::user()->profile_photo_url ?? asset('images/default_avatar.png') }}" class="rounded-circle me-1" alt="Avatar" style="width: 30px; height: 30px;"> --}}
-                        <div>
-                            {{ Auth::user()->name ?? 'John Doe' }}</br>
-                            <span class="badge text-bg-primary">Admin</span>
+                        <div class="row d-flex flex-column">
+                            <div class="col-12">
+                                <small>{{ Auth::user()->toFetchDTO()->name ?? 'John Doe' }}</small>
+                            </div>
+                            <div class="col-6">
+                                <span class="badge text-bg-primary">{{ Auth::user()->toFetchDTO()->profile['profile'] }}</span>
+                            </div>
                         </div>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
-                            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-                            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
-                        </svg>
+                        <image
+                            width="40" 
+                            height="40" 
+                            src="https://demos.pixinvent.com/vuexy-html-admin-template/assets/img/avatars/1.png"
+                            style="border-radius: 100%"
+                        />
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        {{-- <a class="dropdown-item" href="{{ route('profile.show') }}">Perfil</a> --}}
                         <a class="dropdown-item" href="#">Configurações</a>
-                        <a class="dropdown-item" href="#">Sair</a>
-                        {{-- <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{{ route('login') }}"
-                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            Sair
-                        </a>
-                        <form id="logout-form" action="{{ route('login') }}" method="POST" class="d-none">
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                             @csrf
-                        </form> --}}
+                        </form>
+                        <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Sair</a>
                     </div>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

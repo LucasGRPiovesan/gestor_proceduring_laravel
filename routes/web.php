@@ -1,7 +1,7 @@
 <?php
 
-// use App\Http\Controllers\SystemController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,52 +14,28 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return redirect('/settings/profiles');
-});
+Route::get('/login', [AuthController::class, 'index'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('auth');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-/* Route::get('/login', function () {
-    return view('login');
-})->name('login'); */
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+    Route::prefix('registers')->group(function () {
+        Route::view('/forms', 'registers.forms')->name('forms');
+        Route::view('/checklists', 'registers.checklists')->name('checklists');
+        Route::view('/sheets', 'registers.sheets')->name('sheets');
+        Route::view('/texts', 'registers.texts')->name('texts');
+        Route::view('/gallery', 'registers.gallery')->name('gallery');
+    });
 
-Route::prefix('registers')->group(function () {
-    Route::get('/forms', function () {
-        return view('registers.forms');
-    })->name('forms');
-
-    Route::get('/checklists', function () {
-        return view('registers.checklists');
-    })->name('checklists');
-
-    Route::get('/sheets', function () {
-        return view('registers.sheets');
-    })->name('sheets');
-
-    Route::get('/texts', function () {
-        return view('registers.texts');
-    })->name('texts');
-
-    Route::get('/gallery', function () {
-        return view('registers.gallery');
-    })->name('gallery');
-});
-
-Route::prefix('settings')->group(function () {
-    Route::get('/profiles', function () {
-        return view('settings.profiles');
-    })->name('profiles');
-
-    Route::get('/users', function () {
-        return view('settings.users');
-    })->name('users');
-
-    Route::get('/logs', function () {
-        return view('settings.logs');
-    })->name('logs');
+    Route::prefix('settings')->group(function () {
+        Route::view('/profiles', 'settings.profiles')->name('profiles');
+        Route::view('/users', 'settings.users')->name('users');
+        Route::view('/logs', 'settings.logs')->name('logs');
+    });
 });
 
 // Route::post('/login', [SystemController::class, 'auth']);

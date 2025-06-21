@@ -1,6 +1,6 @@
 <div class="bg-dark border-right" id="sidebar-wrapper">
-    <div class="sidebar-heading text-white">Meu Painel Admin</div>
-    <div class="list-group list-group-flush">
+    {{-- <div class="sidebar-heading text-white">Meu Painel Admin</div> --}}
+    <div class="list-group list-group-flush mt-4">
 
         {{-- Item de Dashboard (direto, sem sub-itens) --}}
         <a href="{{ route('dashboard') }}" class="list-group-item list-group-item-action bg-dark text-white">

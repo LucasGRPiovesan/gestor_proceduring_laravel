@@ -14,9 +14,7 @@ class ExampleTest extends TestCase
      */
     public function test_example()
     {
-        $response = $this->get('/');
-
-        $response->assertStatus(302);
-        $response->assertRedirect('/settings/profiles');
+        $response = $this->get('/login');
+        $response->assertStatus(200);
     }
 }

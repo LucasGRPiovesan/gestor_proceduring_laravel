@@ -20,23 +20,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-/* Route::group(['middleware' => ['api']], function () {
-
-    // Route::post('/login', [SystemController::class, 'auth']);
-    
-    // Profile
-    Route::middleware('auth:sanctum')->get('/profile', [ProfileController::class, 'list']);
-    Route::middleware('auth:sanctum')->get('/profile/{uuid}', [ProfileController::class, 'fetch']);
-    Route::middleware('auth:sanctum')->post('/profile', [ProfileController::class, 'post']);
-    Route::middleware('auth:sanctum')->delete('/profile/{uuid}', [ProfileController::class, 'delete']);
-    
-    // Users
-    Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'list']);
-    Route::middleware('auth:sanctum')->get('/user/{uuid}', [UserController::class, 'fetch']);
-    Route::middleware('auth:sanctum')->post('/user', [UserController::class, 'post']);
-    Route::middleware('auth:sanctum')->delete('/user/{uuid}', [UserController::class, 'delete']);
-}); */
-
 // Profile
 Route::get('/profile', [ProfileController::class, 'list']);
 Route::get('/profile/{uuid}', [ProfileController::class, 'fetch']);
@@ -44,6 +27,7 @@ Route::post('/profile', [ProfileController::class, 'store']);
 Route::patch('/profile/{uuid}', [ProfileController::class, 'update']);
 Route::delete('/profile/{uuid}', [ProfileController::class, 'delete']);
 Route::get('/profile-select', [ProfileController::class, 'options']);
+
 // Users
 Route::get('/user', [UserController::class, 'list']);
 Route::get('/user/{uuid}', [UserController::class, 'fetch']);
@@ -51,5 +35,6 @@ Route::post('/user', [UserController::class, 'store']);
 Route::patch('/user/{uuid}', [UserController::class, 'update']);
 Route::delete('/user/{uuid}', [UserController::class, 'delete']);
 
+// Modules
 Route::get('/module', [ModuleController::class, 'list']);
 Route::get('/module-permissions', [ModuleController::class, 'permissionsByModule']);

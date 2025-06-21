@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Application\DTO\User\FetchUserDTO;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -61,5 +63,10 @@ class User extends Authenticatable
     public function profile()
     {
         return $this->belongsTo(Profile::class, 'uuid_profile', 'uuid');
+    }
+
+    public function toFetchDTO(): FetchUserDTO
+    {
+        return FetchUserDTO::fromEntity($this);
     }
 }
